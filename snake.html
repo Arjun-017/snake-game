@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang = 'en'>
+<head>
+	<meta charset="utf-8">
+	<link rel="preconnect" href="https://fonts.gstatic.com">
+	<link href="https://fonts.googleapis.com/css2?family=Michroma&display=swap" rel="stylesheet"> 
+	<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;600&display=swap" rel="stylesheet"> 
+	<title>Snake Game</title>
+	<style type="text/css" media="screen">
+		*{
+			margin: 0px;
+			padding: 0px;
+		}
+		#banner{
+			position: absolute;
+			width: 500px;
+			height: 500px;
+			background-color: black;
+			color: white;
+			text-align: center;
+		}
+		#banner-text{
+			font-family: 'Michroma', sans-serif;
+			font-size: 50px;
+
+		}
+		button{
+			background-color: black;
+			color: white;
+			width: 150px;
+			height: 50px;
+			font-family: 'Poppins', sans-serif;
+			font-size: 20px;
+			transition: 0.5s;
+		}
+		button:hover{
+			background-color: white;
+			color: black;
+			font-size: 20px;
+		}
+		#button-banner{
+			border: 10px solid white;
+			width: 300px;
+			height: 180px;
+			margin:  0px auto;
+			display: block;
+			align-items: center;
+			justify-content: center;
+			padding: 40px;
+		}
+		#mycanvas{
+			background-color: black;
+		}
+	</style>
+</head>
+<body>
+	<div id = 'banner'>
+		<h1 id = 'banner-text'>SNAKE <br> GAME</h1>
+		<br>
+		<br><br>
+		<div id = "button-banner">
+			<ul style="list-style-type:none;">
+			<li><button type="button" onclick="gameStart(4);">Easy</button></li>
+			<br>
+			<li><button type="button" onclick="gameStart(8);">Medium</button></li>
+			<br>
+			<li><button type="button" onclick="gameStart(16);">Hard</button></li>
+		</ul>
+		</div>
+	</div>
+
+	<canvas id = "mycanvas" width="500px" height="500px">
+	</canvas>
+	<div id = 'scorecard'>
+		<h1 id = 'score'></h1>
+	</div>
+	<script>
+function gameStart(speed){
+	var banner = document.getElementById('banner')
+	banner.style.display = 'none'
+
+	const c = document.getElementById('mycanvas')
+	const ctx = c.getContext('2d')
+	ctx.fillStyle = 'green'
+	var panel = document.getElementById('score')
+	var ax = 50
+	var ay = 50
+	var score = 0
+	let square = 25
+	let gridNumber = 20
+	let snakeLength = 1
+	let snake = []
+	let snakecell = [25,25]
+	let dir = 'right'
+	let apple = [50,50]
+	let gameOver = false
+	let t = [0,0]
+
+	snake[0] = snakecell
+
+	document.addEventListener('keydown', function(event) {
+    	if(event.keyCode == 38) {
+        dir = 'up'
+
+    	}
+    	else if(event.keyCode == 40) {
+        dir = 'down'
+   		 }
+
+    	else if(event.keyCode == 37) {
+        dir = 'left'
+   		 }
+
+    	else if(event.keyCode == 39) {
+        dir = 'right'
+   		 }
+   		 });
+
+    function drawSnake(){
+    	ctx.clearRect(0,0,500,500)
+    	for(i = 0;i<snakeLength;i++){
+    		ctx.fillStyle = 'green'
+    		ctx.fillRect(snake[i][0],snake[i][1],25,25)
+    	}
+    }
+    function gameLoop(){
+    	checkCollision()
+    	
+    	if(snake[0][0] == apple[0] && snake[0][1] == apple[1]){
+    		if(dir == 'left'){
+    			sx = snake[snakeLength-1][0] + 25
+    			sy = snake[snakeLength-1][1]
+    		}
+    		if(dir == 'right'){
+    			sx = snake[snakeLength-1][0] - 25
+    			sy = snake[snakeLength-1][1]
+    		}
+    		if(dir == 'down'){
+    			sx = snake[snakeLength-1][0]
+    			sy = snake[snakeLength-1][1] - 25
+    		}
+    		if(dir == 'up'){
+    			sx = snake[snakeLength-1][0]
+    			sy = snake[snakeLength-1][1] + 25
+    		}
+    		console.log(sx,sy)
+    		snake.push([sx,sy])
+    		snakeLength = snakeLength+1
+    		console.log(snake[0][0],snake[0][1],snake[1][0],snake[1][1])
+    		apple[0] = Math.floor(Math.random()*gridNumber)*square
+    		apple[1] = Math.floor(Math.random()*gridNumber)*square
+    		score = score + 1
+    	}
+
+    	for(i = snakeLength;i>1;i--){
+    		snake[i-1][0] = snake[i-2][0]
+    		snake[i-1][1] = snake[i-2][1]
+    	}
+    	
+    	if(dir == 'left'){
+    		snake[0][0] = snake[0][0] - 25
+    	}
+
+    	if(dir == 'right'){
+    		snake[0][0] = snake[0][0] + 25
+    	}
+
+    	if(dir == 'up'){
+    		snake[0][1] = snake[0][1] - 25
+    	}
+
+    	if(dir == 'down'){
+    		snake[0][1] = snake[0][1] + 25
+    	}
+
+    	panel.innerHTML = score
+    	drawSnake()
+    	drawApple()
+    }
+    function drawApple(){
+    	ctx.fillStyle = 'red'
+    	ctx.fillRect(apple[0],apple[1],25,25)
+    }
+    function checkCollision(){
+    	for(i = 0;i<snakeLength;i++){
+    		t[0] = snake[i][0]
+    		t[1] = snake[i][1]
+    		for(j = i+1;j<snakeLength;j++){
+    			if(t[0] == snake[j][0] && t[1] == snake[j][1]){
+    				gameOver = true
+    			}
+    		}
+    	}
+    	if(snake[0][0]<0 || snake[0][0]>=500 || snake[0][1]<0 || snake[0][1]>=500){
+    		gameOver = true
+    	}
+    	if(gameOver){
+    		alert('Game Over')
+    		gameOver = false
+    		location.reload()
+    	}
+    }
+
+	setInterval(gameLoop,1000/speed)
+}
+
+</script>
+</body>
+</html>
